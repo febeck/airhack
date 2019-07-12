@@ -17,10 +17,6 @@ app.post('/incomingTasks', function(req, res) {
   res.send(result)
 })
 
-app.get('/'), function(req, res) {
-  res.send("hello world")
-}
-
 var port = process.env.PORT || 8080;
 
 app.listen(port, function() {
