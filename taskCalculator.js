@@ -5,7 +5,7 @@ function getRandomInt(max) {
 function taskCalculator(batch) {
   const { tasks, taskersCount } = batch
   const assignedTasks = tasks.reduce((acc, task, i) => {
-    if (i <= taskersCount) {
+    if (i < taskersCount) {
       acc.push(Object.assign(task, { assignee_id: i + 1 }))
     } else {
       acc.push(task)
