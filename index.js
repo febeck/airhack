@@ -2,15 +2,15 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const axios = require('axios')
 
-axios.interceptors.request.use(request => {
-  console.log('Starting Request', request)
-  return request
-})
+// axios.interceptors.request.use(request => {
+//   console.log('Starting Request', request)
+//   return request
+// })
 
-axios.interceptors.response.use(response => {
-  console.log('Response:', response)
-  return response
-})
+// axios.interceptors.response.use(response => {
+//   console.log('Response:', response)
+//   return response
+// })
 
 const { taskCalculator } = require('./taskCalculator.js')
 
@@ -34,15 +34,10 @@ app.post('/incomingTasks', function(req, res) {
     data: taskCalculator(body),
     url: 'http://airhack-api.herokuapp.com/api/submitTasks',
   }
-  return axios(options)
-    .then(apiResponse => {
-      console.log('API RESPONSE', apiResponse)
-      res.send(apiResponse)
-    })
-    .catch(e => {
-      console.error('API ERROR', apiResponse)
-      res.send("An error occured")
-    })
+  return axios(options).then(apiResponse => {
+    console.log('API RESPONSE', apiResponse)
+    res.send('success')
+  })
 })
 
 var port = process.env.PORT || 8080
