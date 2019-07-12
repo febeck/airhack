@@ -34,10 +34,15 @@ app.post('/incomingTasks', function(req, res) {
     data: taskCalculator(body),
     url: 'http://airhack-api.herokuapp.com/api/submitTasks',
   }
-  return axios(options).then(apiResponse => {
-    console.log('API RESPONSE', apiResponse)
-    res.send('success')
-  })
+  return axios(options)
+    .then(apiResponse => {
+      console.log('API RESPONSE', apiResponse)
+      res.send('success')
+    })
+    .catch(e => {
+      console.log(e)
+      res.send(e)
+    })
 })
 
 var port = process.env.PORT || 8080
