@@ -1,5 +1,16 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const axios = require('axios')
+
+axios.interceptors.request.use(request => {
+  console.log('Starting Request', request)
+  return request
+})
+
+axios.interceptors.response.use(response => {
+  console.log('Response:', response)
+  return response
+})
 
 const { taskCalculator } = require('./taskCalculator.js')
 
@@ -14,7 +25,20 @@ app.get('/', function(req, res) {
 app.post('/incomingTasks', function(req, res) {
   const { body } = req
   const result = taskCalculator(body)
-  res.send(result)
+  const options = {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: 'TLeu9glRLo42ehAxakosxLSfI0Xj5V4Yb6vocDL47ccCvUHuDhwpXgUw3vTp',
+    },
+    data: taskCalculator(body),
+    url: 'http://airhack-api.herokuapp.com/api/submitTasks',
+  }
+  return axios(options)
+    .then(response => {
+      return res.send(result)
+    })
+    .catch(e => console.error(e))
 })
 
 var port = process.env.PORT || 8080;
