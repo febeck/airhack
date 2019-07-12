@@ -17,6 +17,8 @@ app.get('/'), function(req, res) {
   res.send("hello world")
 }
 
-app.listen(3000, function() {
-  console.log('App running on port 3000!')
+var port = process.env.PORT || 8080;
+
+app.listen(port, function() {
+  console.log(`App running on port ${port}!`)
 })
