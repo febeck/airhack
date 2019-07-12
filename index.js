@@ -37,6 +37,7 @@ app.post('/incomingTasks', function(req, res) {
   return axios(options)
     .then(apiResponse => {
       console.log('API RESPONSE', apiResponse)
+      return "Success"
     })
     .catch(e => console.error('API ERROR', apiResponse))
 })
