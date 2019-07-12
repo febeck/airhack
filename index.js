@@ -35,10 +35,10 @@ app.post('/incomingTasks', function(req, res) {
     url: 'http://airhack-api.herokuapp.com/api/submitTasks',
   }
   return axios(options)
-    .then(response => {
-      return res.send(result)
+    .then(apiResponse => {
+      console.log('API RESPONSE', apiResponse)
     })
-    .catch(e => console.error(e))
+    .catch(e => console.error('API ERROR', apiResponse))
 })
 
 var port = process.env.PORT || 8080
