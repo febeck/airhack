@@ -37,9 +37,12 @@ app.post('/incomingTasks', function(req, res) {
   return axios(options)
     .then(apiResponse => {
       console.log('API RESPONSE', apiResponse)
-      return "Success"
+      res.send(apiResponse)
     })
-    .catch(e => console.error('API ERROR', apiResponse))
+    .catch(e => {
+      console.error('API ERROR', apiResponse)
+      res.send("An error occured")
+    })
 })
 
 var port = process.env.PORT || 8080
