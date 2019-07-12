@@ -13,6 +13,10 @@ app.post('/incomingTasks', function(req, res) {
   res.send(result)
 })
 
+app.get('/'), function(req, res) {
+  res.send("hello world")
+}
+
 app.listen(3000, function() {
   console.log('App running on port 3000!')
 })
