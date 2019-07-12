@@ -29,7 +29,7 @@ app.post('/incomingTasks', function(req, res) {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      authorization: 'TLeu9glRLo42ehAxakosxLSfI0Xj5V4Yb6vocDL47ccCvUHuDhwpXgUw3vTp',
+      Authorization: 'Bearer TLeu9glRLo42ehAxakosxLSfI0Xj5V4Yb6vocDL47ccCvUHuDhwpXgUw3vTp',
     },
     data: taskCalculator(body),
     url: 'http://airhack-api.herokuapp.com/api/submitTasks',
@@ -41,7 +41,7 @@ app.post('/incomingTasks', function(req, res) {
     .catch(e => console.error(e))
 })
 
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 8080
 
 app.listen(port, function() {
   console.log(`App running on port ${port}!`)
