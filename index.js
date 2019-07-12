@@ -7,6 +7,10 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+app.get('/', function(req, res) {
+  res.send('API is up !')
+})
+
 app.post('/incomingTasks', function(req, res) {
   const { body } = req
   const result = taskCalculator(body)
