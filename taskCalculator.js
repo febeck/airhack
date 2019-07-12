@@ -4,6 +4,15 @@ function getRandomInt(max) {
 
 function taskCalculator(batch) {
   const { tasks, taskersCount } = batch
+  console.log("#########################")
+  console.log("#########################")
+  console.log("#########################")
+  console.log("#########################")
+  console.log(batch)
+  console.log("#########################")
+  console.log("#########################")
+  console.log("#########################")
+  console.log("#########################")
   const assignedTasks = tasks.reduce((acc, task, i) => {
     if (i < taskersCount) {
       acc.push(Object.assign(task, { assignee_id: i + 1 }))
