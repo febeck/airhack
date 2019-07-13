@@ -66,8 +66,7 @@ function taskCalculator(batch) {
     currentTasks.set(taskToCheck['id'], taskToCheck)
   }
   batch.tasks = sortedTasks
-  return tasks
-  // return Object.assign(batch, { tasks: sortedTasks })
+  return Object.assign(batch, { tasks: sortedTasks })
 }
 
 module.exports = {
