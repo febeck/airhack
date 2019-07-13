@@ -25,7 +25,7 @@ function parse_time(t) {
 }
 
 const checkin_time = moment.duration(0.5, "H")
-const speed = 5
+const speed = 9
 
 function canTakeTask(currentTask, nextTask) {
   // console.log(currentTask, nextTask)
