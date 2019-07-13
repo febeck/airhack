@@ -2,7 +2,7 @@ const _ = require('lodash')
 const moment = require('moment')
 
 const TASK_DURATION = 30
-const MOVING_SPEED = 9 / 60
+const MOVING_SPEED = 9.9 / 60
 
 if (typeof Number.prototype.toRad === 'undefined') {
   Number.prototype.toRad = function() {
