@@ -1,12 +1,14 @@
 const express = require('express')
 var bodyParser = require('body-parser')
 const axios = require('axios')
+var cors = require('cors')
 
 const { taskCalculator } = require('./taskCalculator.js')
 
 const app = express()
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(cors())
+app.use(bodyParser.json({ limit: '50mb' }))
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 
 app.get('/', function(req, res) {
   res.send('API is up !')
