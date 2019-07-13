@@ -1,5 +1,5 @@
 const express = require('express')
-const bodyParser = require('body-parser')
+var bodyParser = require('body-parser')
 const axios = require('axios')
 
 // axios.interceptors.request.use(request => {
@@ -15,8 +15,8 @@ const axios = require('axios')
 const { taskCalculator } = require('./taskFernando.js')
 
 const app = express()
-app.use(bodyParser.urlencoded({ {limit: '50mb', extended: true} }))
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.get('/', function(req, res) {
   res.send('API is up !')
