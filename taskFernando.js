@@ -2,7 +2,7 @@ const _ = require('lodash')
 const moment = require('moment')
 
 const TASK_DURATION = 30
-const MOVING_TIME = 60 * 10
+const MOVING_SPEED = 9 / 60
 
 if (typeof Number.prototype.toRad === 'undefined') {
   Number.prototype.toRad = function() {
@@ -28,8 +28,8 @@ function calculateDistanceBetweenTasks(t1, t2) {
   return distance(lng1, lat1, lng2, lat2)
 }
 
-function canDoTask(firstTask, nextTask, distance, movingSpeed = MOVING_TIME, taskDuration = TASK_DURATION) {
-  const timeToNextTask = Math.floor(distance / movingSpeed) + taskDuration
+function canDoTask(firstTask, nextTask, distance, movingSpeed = MOVING_SPEED, taskDuration = TASK_DURATION) {
+  const timeToNextTask = Math.ceil(distance / movingSpeed) + taskDuration
   return moment(firstTask.dueTime, 'HH:mm')
     .add(timeToNextTask, 'minutes')
     .isBefore(moment(nextTask.dueTime, 'HH:mm'))
