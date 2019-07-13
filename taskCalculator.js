@@ -77,8 +77,9 @@ function taskCalculator(batch) {
     })
     // console.log(`Current tasks`, currentTasks)
   }
-  _.forEach(batch.tasks, task => {
-    task.assignee_id = tasksTaken[task.id]
+  _.forEach(Object.keys(tasksTaken), taskId => {
+    i = _.findIndex(batch.tasks, task => task.id == taskId)
+    batch.tasks[i].assignee_id = tasksTaken[taskId]
   })
   return batch
 }
