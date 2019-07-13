@@ -79,8 +79,8 @@ function solveBatch(batch) {
 
 function taskCalculator(batch) {
   batches = [batch]
-  _.forEach(batches, batch => {
-    batch = { batch: Object.assign(batch, { tasks: solveBatch(batch) }), tasksByUser }
+  _.forEach(batches, batchos => {
+    batch = { batch: Object.assign(batch, { tasks: solveBatch(batchos) }), tasksByUser }
   })
   return batch
 }
