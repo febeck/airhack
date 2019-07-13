@@ -2,16 +2,6 @@ const express = require('express')
 var bodyParser = require('body-parser')
 const axios = require('axios')
 
-// axios.interceptors.request.use(request => {
-//   console.log('Starting Request', request)
-//   return request
-// })
-
-// axios.interceptors.response.use(response => {
-//   console.log('Response:', response)
-//   return response
-// })
-
 const { taskCalculator } = require('./taskFernando.js')
 
 const app = express()
@@ -22,16 +12,19 @@ app.get('/', function(req, res) {
   res.send('API is up !')
 })
 
+let tasksByUser
+
 app.post('/incomingTasks', function(req, res) {
   const { body } = req
   const result = taskCalculator(body)
+  tasksByUser = result.tasksByUser
   const options = {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       Authorization: 'Bearer TLeu9glRLo42ehAxakosxLSfI0Xj5V4Yb6vocDL47ccCvUHuDhwpXgUw3vTp',
     },
-    data: taskCalculator(body),
+    data: result.batch,
     url: 'http://airhack-api.herokuapp.com/api/submitTasks',
   }
   return axios(options)
@@ -43,6 +36,10 @@ app.post('/incomingTasks', function(req, res) {
       console.log(e)
       res.send(e)
     })
+})
+
+app.get('/myTasks', function(req, res) {
+  return res.send(tasksByUser.get(parseInt(req.query.userId, 10)))
 })
 
 var port = process.env.PORT || 8080

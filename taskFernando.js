@@ -37,14 +37,15 @@ function canDoTask(firstTask, nextTask, distance, movingSpeed = MOVING_SPEED, ta
 
 function taskCalculator(batch) {
   const { tasks, taskersCount } = batch
-  // TODO: improve sort by time
   const sortedTasks = _.sortBy(tasks, 'dueTime')
   const currentTasks = new Map()
+  const tasksByUser = new Map()
 
   // Initialize the tasks for the first taskers
   for (let i = 0; i < Math.min(taskersCount, tasks.length); i++) {
     sortedTasks[i]['assignee_id'] = i
     currentTasks.set(sortedTasks[i].id, sortedTasks[i])
+    tasksByUser.set(i, [sortedTasks[i]])
   }
 
   for (let i = taskersCount; i < tasks.length; i++) {
@@ -61,12 +62,19 @@ function taskCalculator(batch) {
       }
     })
     if (!canTakeTask) continue
-    taskToCheck['assignee_id'] = minDistanceTask['assignee_id']
+
+    const assignedUser = minDistanceTask['assignee_id']
+    taskToCheck['assignee_id'] = assignedUser
+
+    // Add new task to mapping user => tasks
+    const previousTasks = tasksByUser.get(assignedUser)
+    tasksByUser.set(assignedUser, [...previousTasks, taskToCheck])
+
+    // Update current tasks
     currentTasks.delete(minDistanceTask['id'])
     currentTasks.set(taskToCheck['id'], taskToCheck)
   }
-  batch.tasks = sortedTasks
-  return Object.assign(batch, { tasks: sortedTasks })
+  return { batch: Object.assign(batch, { tasks: sortedTasks }), tasksByUser }
 }
 
 module.exports = {
