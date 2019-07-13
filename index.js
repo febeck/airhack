@@ -15,7 +15,7 @@ const axios = require('axios')
 const { taskCalculator } = require('./taskFernando.js')
 
 const app = express()
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }))
+app.use(bodyParser.urlencoded({ {limit: '50mb', extended: true} }))
 app.use(bodyParser.json())
 
 app.get('/', function(req, res) {
