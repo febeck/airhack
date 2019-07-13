@@ -2,7 +2,7 @@ const _ = require('lodash')
 const moment = require('moment')
 
 const TASK_DURATION = 30
-const MOVING_SPEED = 9.9 / 60
+const MOVING_SPEED = 9 / 60
 
 if (typeof Number.prototype.toRad === 'undefined') {
   Number.prototype.toRad = function() {
@@ -35,7 +35,7 @@ function canDoTask(firstTask, nextTask, distance, movingSpeed = MOVING_SPEED, ta
     .isBefore(moment(nextTask.dueTime, 'HH:mm'))
 }
 
-function taskCalculator(batch) {
+function solveBatch(batch) {
   const { tasks, taskersCount } = batch
   const sortedTasks = _.sortBy(tasks, 'dueTime')
   const currentTasks = new Map()
@@ -74,7 +74,15 @@ function taskCalculator(batch) {
     currentTasks.delete(minDistanceTask['id'])
     currentTasks.set(taskToCheck['id'], taskToCheck)
   }
-  return { batch: Object.assign(batch, { tasks: sortedTasks }), tasksByUser }
+  return sortedTasks
+}
+
+function taskCalculator(batch) {
+  batches = [batch]
+  _.forEach(batches, batch => {
+    batch = { batch: Object.assign(batch, { tasks: solveBatch(batch) }), tasksByUser }
+  })
+  return batch
 }
 
 module.exports = {
