@@ -65,8 +65,9 @@ function taskCalculator(batch) {
     currentTasks.delete(minDistanceTask['id'])
     currentTasks.set(taskToCheck['id'], taskToCheck)
   }
-
-  return Object.assign(batch, { tasks: sortedTasks })
+  batch.tasks = sortedTasks
+  return tasks
+  // return Object.assign(batch, { tasks: sortedTasks })
 }
 
 module.exports = {
