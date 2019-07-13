@@ -1,87 +1,80 @@
-const _ =require('lodash');
-var moment = require('moment');
+const _ = require('lodash')
+const moment = require('moment')
 
-/** Converts numeric degrees to radians */
-if (typeof(Number.prototype.toRad) === "undefined") {
+const TASK_DURATION = 30
+const MOVING_SPEED = 9 / 60
+
+if (typeof Number.prototype.toRad === 'undefined') {
   Number.prototype.toRad = function() {
-    return this * Math.PI / 180;
+    return (this * Math.PI) / 180
   }
 }
 
 function distance(lon1, lat1, lon2, lat2) {
-  var R = 6371; // Radius of the earth in km
-  var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
-  var dLon = (lon2-lon1).toRad();
-  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) *
-          Math.sin(dLon/2) * Math.sin(dLon/2);
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  var d = R * c; // Distance in km
-  return d;
+  var R = 6371 // Radius of the earth in km
+  var dLat = Math.abs(lat2 - lat1).toRad() // Javascript functions in radians
+  var dLon = Math.abs(lon2 - lon1).toRad()
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  var d = R * c // Distance in km
+  return d
 }
 
-function parse_time(t) {
-  return moment(t, "HH:mm")
+function calculateDistanceBetweenTasks(t1, t2) {
+  const { lat: lat1, lng: lng1 } = t1
+  const { lat: lat2, lng: lng2 } = t2
+  return distance(lng1, lat1, lng2, lat2)
 }
 
-const checkin_time = moment.duration(0.5, "H")
-const speed = 9
-
-function canTakeTask(currentTask, nextTask) {
-  // console.log(currentTask, nextTask)
-  const prev_time = parse_time(currentTask.dueTime)
-  const next_time = parse_time(nextTask.dueTime)
-  const hours_spent_travelling = moment.duration(distance(
-    currentTask.lng,
-    currentTask.lat,
-    nextTask.lng,
-    nextTask.lat,
-  ) / speed, "H")
-  const arrival_time = moment(prev_time + hours_spent_travelling + checkin_time)
-  // console.log(`starts at ${prev_time}, arrives at ${arrival_time}, next is ${next_time}`)
-  // console.log(arrival_time <= next_time)
-  return arrival_time <= next_time
+function canDoTask(firstTask, nextTask, distance, movingSpeed = MOVING_SPEED, taskDuration = TASK_DURATION) {
+  const timeToNextTask = Math.ceil(distance / movingSpeed) + taskDuration
+  return moment(firstTask.dueTime, 'HH:mm')
+    .add(timeToNextTask, 'minutes')
+    .isBefore(moment(nextTask.dueTime, 'HH:mm'))
 }
-
 
 function taskCalculator(batch) {
-  //  Initialize
-  const {tasks, taskersCount} = batch
-  const sortedTasks = _.sortBy(tasks, "dueTime")
-  const tasksTaken = {}
-  const currentTasks = {}
-  for (i=0; i<taskersCount && i< sortedTasks.length ; i++) {
-    currentTasks[i+1] = sortedTasks[i].id
-    tasksTaken[sortedTasks[i].id] = i+1
+  const { tasks, taskersCount } = batch
+  const sortedTasks = _.sortBy(tasks, 'dueTime')
+  const currentTasks = new Map()
+  const tasksByUser = new Map()
+
+  // Initialize the tasks for the first taskers
+  for (let i = 0; i < Math.min(taskersCount, tasks.length); i++) {
+    sortedTasks[i]['assignee_id'] = i
+    currentTasks.set(sortedTasks[i].id, sortedTasks[i])
+    tasksByUser.set(i, [sortedTasks[i]])
   }
 
-  // Iterate
-  while(Object.keys(currentTasks).length >= 1) {
-    _.forEach(_.keys(currentTasks), tasker => {
-      const currentTaskId = currentTasks[tasker]
-      const current_task_index = _.findIndex(sortedTasks, task => task.id == currentTaskId)
-      if (current_task_index < 0 || current_task_index == sortedTasks.length-1) {
-        delete currentTasks[tasker];
-        return
-      }
-      const currentTask = sortedTasks[current_task_index]
-      for (let i = current_task_index+1; i<sortedTasks.length; i++) {
-        if (canTakeTask(currentTask, sortedTasks[i]) && !_.keys(tasksTaken).includes(sortedTasks[i].id)) {
-          currentTasks[tasker] = sortedTasks[i].id
-          // console.log(`tasker ${tasker} takes task ${sortedTasks[i].id}`)
-          tasksTaken[sortedTasks[i].id] = parseInt(tasker)
-          break;
-        }
-        delete currentTasks[tasker];
+  for (let i = taskersCount; i < tasks.length; i++) {
+    const taskToCheck = sortedTasks[i]
+    let canTakeTask = false
+
+    const minDistanceTask = _.minBy(Array.from(currentTasks.values()), task => {
+      const distance = calculateDistanceBetweenTasks(task, taskToCheck)
+      if (canDoTask(task, taskToCheck, distance)) {
+        canTakeTask = true
+        return distance
+      } else {
+        return Infinity
       }
     })
-    // console.log(`Current tasks`, currentTasks)
+    if (!canTakeTask) continue
+
+    const assignedUser = minDistanceTask['assignee_id']
+    taskToCheck['assignee_id'] = assignedUser
+
+    // Add new task to mapping user => tasks
+    const previousTasks = tasksByUser.get(assignedUser)
+    tasksByUser.set(assignedUser, [...previousTasks, taskToCheck])
+
+    // Update current tasks
+    currentTasks.delete(minDistanceTask['id'])
+    currentTasks.set(taskToCheck['id'], taskToCheck)
   }
-  _.forEach(Object.keys(tasksTaken), taskId => {
-    i = _.findIndex(batch.tasks, task => task.id == taskId)
-    batch.tasks[i].assignee_id = tasksTaken[taskId]
-  })
-  return batch
+  return { batch: Object.assign(batch, { tasks: sortedTasks }), tasksByUser }
 }
 
 module.exports = {
